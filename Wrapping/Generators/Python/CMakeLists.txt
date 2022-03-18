@@ -192,26 +192,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/WrapITK.pth.in"
 ###############################################################################
 # Define the wrapping macros
 
-macro(itk_wrap_module_python library_name)
-  set(ITK_WRAP_PYTHON_CONFIGURATION_TEMPLATES "")
-  set(ITK_WRAP_PYTHON_LIBRARY_IMPORTS "")
-  set(ITK_WRAP_PYTHON_LIBRARY_DEPS )
-  set(ITK_WRAP_PYTHON_LIBRARY_DECLS )
-  set(ITK_WRAP_PYTHON_LIBRARY_CALLS "
-  PyObject * sysModules = PyImport_GetModuleDict();\n")
-  set(ITK_WRAP_PYTHON_CXX_FILES )
-  set(ITK_WRAP_PYTHON_PYTHON_FILES )
-  if(MSVC)
-    get_filename_component(python_library_directory "${Python3_LIBRARIES}" DIRECTORY)
-    # It should use the following code inside `itk_end_wrap_module_python` but
-    # `target_link_directories()` was only added to CMake 3.13.
-    # target_link_directories(${lib} PUBLIC ${python_library_directory})
-    link_directories(${python_library_directory})
-    unset(python_library_directory)
-  endif()
-endmacro()
-
-
 macro(itk_setup_swig_python type base_name interface_file python_file cpp_file doc_file)
 
   #############################################################################
@@ -362,7 +342,7 @@ macro(itk_end_wrap_submodule_python group_name)
   # list of python related c++ files, so they can be built at the end
   # of the current module.
   list(APPEND ITK_WRAP_PYTHON_CXX_FILES ${cpp_file})
-  list(APPEND ITK_WRAP_PYTHON_PYTHON_FILES ${python_file})
+  list(APPEND ITK_WRAP_PYTHON_FILES ${python_file})
 
   # add needed files to the deps list
   list(APPEND ITK_WRAP_PYTHON_LIBRARY_DEPS "${WRAPPER_MASTER_INDEX_OUTPUT_DIR}/python/${base_name}_ext.i" "${cpp_file}")
@@ -407,16 +387,6 @@ macro(ADD_PYTHON_CONFIG_TEMPLATE base_name wrap_class swig_name template_params)
   unset(class_in_module)
   unset(_include)
 endmacro()
-
-
-macro(itk_wrap_submodule_python submodule module)
-  set(ITK_WRAP_PYTHON_SWIG_EXT "%pythonbegin %{\nfrom . import _${module}Python\n%}\n\n")
-
-  # register the module for the lib module
-  set(ITK_WRAP_PYTHON_LIBRARY_IMPORTS "${ITK_WRAP_PYTHON_LIBRARY_IMPORTS}from itk.${submodule}Python import *\n")
-
-endmacro()
-
 
 macro(itk_wrap_template_python name types)
   if("${ITK_WRAP_PYTHON_CURRENT_CLASS}" STREQUAL "itk::ImageSource")
@@ -498,6 +468,8 @@ macro(itk_wrap_simple_type_python wrap_class swig_name)
     string(REGEX REPLACE "__" "_" snake_name "${snake_name}")
     string(TOLOWER "${snake_name}" snake_name)
     ADD_PYTHON_POINTER_TYPEMAP("${smart_pointed}" ${simple_name} ${snake_name})
+    unset(smart_pointed)
+    unset(simple_name)
   endif()
 
 
