@@ -267,6 +267,8 @@ macro(itk_end_wrap_module)
     set(CONFIG_MODULE_INTERFACE_CONTENT ) #"${deps_imports}${SWIG_INTERFACE_MODULE_CONTENT}")
     configure_file("${ITK_WRAP_SWIGINTERFACE_SOURCE_DIR}/module.i.in" "${module_interface_file}"
             @ONLY)
+    unset(deps_imports)
+    unset(module_interface_file)
 
     set(WRAPPING_CONFIG_WORKING_DIR "${ITK_DIR}/Wrapping/WorkingDirectory")
     list(LENGTH i_files number_interface_files)
@@ -323,7 +325,15 @@ macro(itk_end_wrap_module)
         )
       endif()
     endif()
+    unset(number_interface_files)
+    unset(WRAPPING_CONFIG_WORKING_DIR)
+    unset(typedef_in_files)
+    unset(xml_files)
+    unset(swig_libs)
     unset(mdx_opts)
+
+
+
     # the ${WRAPPER_LIBRARY_NAME}Swig target
     if(NOT TARGET ${WRAPPER_LIBRARY_NAME}Swig)
       add_custom_target(${WRAPPER_LIBRARY_NAME}Swig DEPENDS ${mdx_file} ${i_files} ${typedef_files} ${idx_files})
@@ -341,6 +351,11 @@ macro(itk_end_wrap_module)
     set(${WRAPPER_LIBRARY_NAME}IdxFiles ${idx_files} CACHE INTERNAL "Internal ${WRAPPER_LIBRARY_NAME}Idx file list.")
     set(${WRAPPER_LIBRARY_NAME}SwigFiles ${i_files} CACHE INTERNAL "Internal ${WRAPPER_LIBRARY_NAME}Swig file list.")
   endif()
+  unset(mdx_file)
+  unset(typedef_files)
+  unset(idx_files)
+  unset(i_files)
+
   if(${module_prefix}_WRAP_PYTHON AND WRAPPER_LIBRARY_PYTHON)
     # Loop over the extra swig input files and add them to the generated files
     # lists. Guess that the generated cxx output will have the same name as
@@ -472,6 +487,12 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
       "${WRAPPER_MASTER_INDEX_OUTPUT_DIR}/python/${WRAPPER_LIBRARY_NAME}_ext.i"
       @ONLY)
 
+    unset(ITK_WRAP_PYTHON_GLOBAL_TIMESTAMP_CALLS)
+    unset(ITK_WRAP_PYTHON_GLOBAL_TIMESTAMP_DECLS)
+    unset(DO_NOT_WAIT_FOR_THREADS_CALLS)
+    unset(DO_NOT_WAIT_FOR_THREADS_DECLS)
+
+
     # set some var reused later
     set(interface_file "${WRAPPER_MASTER_INDEX_OUTPUT_DIR}/${WRAPPER_LIBRARY_NAME}.i")
     set(_swig_python_suffix "Python")
@@ -488,6 +509,8 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
 
     # Run swig to produce the *Python.cpp and the *Python.py file
     itk_setup_swig_python("Module" ${base_name} ${interface_file} ${python_file} ${cpp_file} "")
+    unset(python_file)
+    unset(interface_file)
 
     # build all the c++ files from this module in a common lib
     if(NOT TARGET ${lib})
@@ -516,6 +539,7 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
         if (ipo_is_supported)
           set_property(TARGET ${lib} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
         endif()
+        unset(ipo_is_supported)
       endif()
 
       # Link the modules together
@@ -555,8 +579,11 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
         endforeach()
       endif()
     endif()
-
   endif()
+  unset(_component_module)
+  unset(cpp_file)
+  unset(lib)
+
   if(${module_prefix}_WRAP_DOC)
     itk_end_wrap_module_DOC()
   endif()
@@ -567,6 +594,7 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
     add_subdirectory(${wrapping_test_directory})
   endif()
   unset(lib)
+  unset(wrapping_test_directory)
 endmacro()
 
 
