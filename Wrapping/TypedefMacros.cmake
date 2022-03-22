@@ -617,7 +617,9 @@ macro(itk_end_wrap_module)
     set(CONFIG_MODULE_INTERFACE_CONTENT ) #"${deps_imports}${SWIG_INTERFACE_MODULE_CONTENT}")
     configure_file("${ITK_WRAP_SWIGINTERFACE_SOURCE_DIR}/module.i.in" "${module_interface_file}"
             @ONLY)
+    unset(deps_imports)
     unset(module_interface_file)
+
     set(WRAPPING_CONFIG_WORKING_DIR "${ITK_DIR}/Wrapping/WorkingDirectory")
     list(LENGTH i_files number_interface_files)
     if(number_interface_files GREATER 0)
@@ -680,14 +682,20 @@ macro(itk_end_wrap_module)
     unset(ITK_STUB_DIR CACHE)
     unset(ITK_PKL_DIR CACHE)
     unset(THIS_MODULE_PYI_INDEX_FILE)
+    unset(WRAPPING_CONFIG_WORKING_DIR)
     unset(typedef_in_files)
+    unset(xml_files)
+    unset(swig_libs)
     unset(mdx_opts)
+
     # the ${WRAPPER_LIBRARY_NAME}Swig target
     if(NOT TARGET ${WRAPPER_LIBRARY_NAME}Swig)
       add_custom_target(${WRAPPER_LIBRARY_NAME}Swig DEPENDS ${mdx_file} ${i_files} ${typedef_files} ${idx_files})
       add_dependencies(${WRAPPER_LIBRARY_NAME}Swig ${WRAPPER_LIBRARY_NAME}CastXML)
     endif()
     unset(typedef_files)
+    unset(mdx_file)
+    unset(i_files)
 
     if(NOT EXTERNAL_WRAP_ITK_PROJECT)
       # don't depend on the targets from wrapitk in external projects
@@ -702,7 +710,7 @@ macro(itk_end_wrap_module)
     list(APPEND GLOBAL_IdxFilesList ${ITK_PYI_INDEX_FILES})
     list(REMOVE_DUPLICATES GLOBAL_IdxFilesList)
     set(GLOBAL_IdxFilesList ${GLOBAL_IdxFilesList} CACHE INTERNAL "Master list of all idx files")
-
+    unset(idx_files)
   endif()
   if(${module_prefix}_WRAP_PYTHON AND WRAPPER_LIBRARY_PYTHON)
     # Loop over the extra swig input files and add them to the generated files
@@ -841,7 +849,8 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
     unset(ITK_WRAP_PYTHON_LIBRARY_IMPORTS)
     unset(ITK_WRAP_PYTHON_GLOBAL_TIMESTAMP_CALLS)
     unset(ITK_WRAP_PYTHON_GLOBAL_TIMESTAMP_DECLS)
-
+    unset(DO_NOT_WAIT_FOR_THREADS_CALLS)
+    unset(DO_NOT_WAIT_FOR_THREADS_DECLS)
 
     # set some var reused later
     set(interface_file "${WRAPPER_MASTER_INDEX_OUTPUT_DIR}/${WRAPPER_LIBRARY_NAME}.i")
@@ -887,6 +896,7 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
         if (ipo_is_supported)
           set_property(TARGET ${lib} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
         endif()
+        unset(ipo_is_supported)
       endif()
 
       # Link the modules together
@@ -916,6 +926,8 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
         DESTINATION "${PY_SITE_PACKAGES_PATH}/itk"
         COMPONENT ${_component_module}${WRAP_ITK_INSTALL_COMPONENT_IDENTIFIER}RuntimeLibraries
         )
+      unset(_component_module)
+
       if(NOT EXTERNAL_WRAP_ITK_PROJECT)
         # don't depends on the targets from wrapitk in external projects
         foreach(dep ${WRAPPER_LIBRARY_DEPENDS})
@@ -926,8 +938,8 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
         endforeach()
       endif()
     endif()
-
   endif()
+
   if(${module_prefix}_WRAP_DOC)
     itk_end_wrap_module_DOC()
   endif()
@@ -937,6 +949,7 @@ ${DO_NOT_WAIT_FOR_THREADS_DECLS}
   if(BUILD_TESTING AND EXISTS ${wrapping_test_directory}/CMakeLists.txt)
     add_subdirectory(${wrapping_test_directory})
   endif()
+  unset(wrapping_test_directory)
   unset(cpp_file)
   unset(python_file)
   unset(interface_file)
