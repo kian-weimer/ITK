@@ -58,13 +58,5 @@ set(WRAPPER_SUBMODULE_ORDER
 #  itkLineCell
 )
 
-dump_cmake_variables(itk_common_pre)
-itk_auto_load_submodules()
 
-itk_end_wrap_module()
-
-#dump_cmake_variables(itk_end_wrap_module_${WRAPPER_LIBRARY_NAME}_post)
-dump_cmake_variables(itk_common_post)
-write_changed_cmake_variables_to_file("${CMAKE_CURRENT_BINARY_DIR}/itk_common.changed"
-        "${itk_common_pre}"
-        "${itk_common_post}")
+itk_auto_load_and_end_wrap_submodules()
