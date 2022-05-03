@@ -87,7 +87,12 @@ SlopeInterceptTest()
   {
     static_cast<PixelType *>(niftiImage->data)[i] = i;
   }
-  nifti_image_write(niftiImage);
+  if (nifti_image_write(this->m_NiftiImage) == -1)
+  {
+    std::cerr << "nifti_image_write failed for file: " << this->GetFileName() << std::endl;
+    return EXIT_FAILURE;
+  }
+
   nifti_image_free(niftiImage);
   //
   // read the image back in

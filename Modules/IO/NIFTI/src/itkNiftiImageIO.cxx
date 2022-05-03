@@ -2197,7 +2197,11 @@ NiftiImageIO ::Write(const void * buffer)
     // Need a const cast here so that we don't have to copy the memory
     // for writing.
     this->m_NiftiImage->data = const_cast<void *>(buffer);
-    nifti_image_write(this->m_NiftiImage);
+    if (nifti_image_write(this->m_NiftiImage) == -1)
+    {
+      itkExceptionMacro(<< "nifti_image_write failed for file: " << this->GetFileName());
+    }
+
     this->m_NiftiImage->data = nullptr; // if left pointing to data buffer
     // nifti_image_free will try and free this memory
   }
@@ -2277,7 +2281,10 @@ NiftiImageIO ::Write(const void * buffer)
     // Need a const cast here so that we don't have to copy the memory for
     // writing.
     this->m_NiftiImage->data = static_cast<void *>(nifti_buf);
-    nifti_image_write(this->m_NiftiImage);
+    if (nifti_image_write(this->m_NiftiImage) == -1)
+    {
+      itkExceptionMacro(<< "nifti_image_write failed for file: " << this->GetFileName());
+    }
     this->m_NiftiImage->data = nullptr; // if left pointing to data buffer
     delete[] nifti_buf;
   }
